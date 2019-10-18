@@ -56,3 +56,27 @@ fun patternMatching() {
 }
 
 ```
+
+# Building
+
+Run the gradle build in order to add the artifact to maven local repository
+
+``` gradle
+gradlew clean assemble publishToMavenLocal
+```
+
+Reference it in the maven build
+
+``` xml
+<dependency>
+    <groupId>com.akt</groupId>
+    <artifactId>konstrukt</artifactId>
+    <version>0.1</version>
+</dependency>
+```
+
+Or in the gradle build
+
+``` gradle
+compile 'com.akt:konstrukt:0.1'
+```
