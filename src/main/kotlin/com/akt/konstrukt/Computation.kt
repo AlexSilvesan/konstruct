@@ -1,25 +1,19 @@
 package com.akt.konstrukt
 
-import java.lang.IllegalStateException
-
 /**
  * Describes a computation that can either produce a result or throws a failure.
  */
 sealed class Computation<T> {
 
     /**
-     * @return the result of the computation.
-     *
-     * @throws IllegalStateException if the computation failed and there is no result.
+     * @return the result of the computation if successful, null otherwise.
      */
-    abstract fun getResult(): T
+    abstract fun getResult(): T?
 
     /**
-     * @return the failure that occurred during the computation.
-     *
-     * @throws IllegalStateException if the computation was successful and there is no failure.
+     * @return the failure that occurred during the computation if failed, null otherwise.
      */
-    abstract fun getFailure(): Throwable
+    abstract fun getFailure(): Throwable?
 
     /**
      * Allows providing a lazy supplier which can provide a fallback value. The fallback supplier is not called in case of successful computation.
@@ -39,7 +33,7 @@ sealed class Computation<T> {
 class SuccessfulComputation<T>(private val result: T) : Computation<T>() {
     override fun getResult() = result
 
-    override fun getFailure() = throw IllegalStateException("Successful computation does not have a failure")
+    override fun getFailure(): Throwable? = null
 
     override fun getResultOrElse(fallbackResultSupplier: () -> T) = result
 
@@ -47,7 +41,7 @@ class SuccessfulComputation<T>(private val result: T) : Computation<T>() {
 }
 
 class FailedComputation<T>(private val failure: Throwable) : Computation<T>() {
-    override fun getResult() = throw IllegalStateException("Failed computation does not have a result")
+    override fun getResult() : T? = null
 
     override fun getFailure() = failure
 
