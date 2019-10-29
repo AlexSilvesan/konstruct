@@ -1,3 +1,7 @@
+# Using the library
+
+## Computation
+
 This library allows dealing with computations that either return a result or throw an exception.
 
 It is meant as an alternative to propagating exceptions by providing handlers for successful or failed computation.
@@ -7,8 +11,6 @@ fun fooSuccess(): Computation<String> = SuccessfulComputation("abc")
 
 fun fooFailure(): Computation<String> = FailedComputation(Exception())
 ```
-
-# Using the library
 
 1. Using java-style consumers
 
@@ -55,6 +57,33 @@ fun patternMatching() {
     }
 }
 
+```
+
+## Composing Functions
+
+This library provides a way to compose functions:
+ 
+Having `f: A -> B, g: B -> C, h: A -> C`  where h(x) = g(f(x)) you can build h function using _compose_ or _composeCurried_ from Functions
+
+```
+val f : (Int) -> Boolean = { it > 0 && ((it and (it - 1)) == 0)} // is power of 2
+val g : (Boolean) -> String = { it.toString().toUpperCase() } // boolean to Uppercase
+```
+
+Then we can use the Functions utilities to compose the above functions
+
+```
+fun compose() {
+    val h = compose(f, g)
+    println ( h(5) )
+    println ( h(16) )
+}
+
+fun composeCurried() {
+    val h = composeCurried<Int, Boolean, String>()(f)(g)
+    println ( h(32) )
+    println ( h(160) )
+}
 ```
 
 # Building
