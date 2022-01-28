@@ -3,7 +3,7 @@ package com.akt.konstrukt
 /**
  * Describes a computation that can either produce a result or throws a failure.
  */
-sealed class Computation<T> {
+sealed class Computation<T, FAILURE> where FAILURE : Throwable {
 
     /**
      * @return the result of the computation if successful, null otherwise.
@@ -13,7 +13,7 @@ sealed class Computation<T> {
     /**
      * @return the failure that occurred during the computation if failed, null otherwise.
      */
-    abstract fun getFailure(): Throwable?
+    abstract fun getFailure(): FAILURE?
 
     /**
      * Allows providing a lazy supplier which can provide a fallback value. The fallback supplier is not called in case of successful computation.
@@ -27,25 +27,25 @@ sealed class Computation<T> {
      *
      * For a given, only the corresponding supplier will be called.
      */
-    abstract fun consume(resultConsumer: (T) -> Unit, failureConsumer: (Throwable) -> Unit)
+    abstract fun consume(resultConsumer: (T) -> Unit, failureConsumer: (FAILURE) -> Unit)
 }
 
-class SuccessfulComputation<T>(private val result: T) : Computation<T>() {
+class SuccessfulComputation<T, FAILURE : Throwable> (private val result: T) : Computation<T, FAILURE>() {
     override fun getResult() = result
 
-    override fun getFailure(): Throwable? = null
+    override fun getFailure(): FAILURE? = null
 
     override fun getResultOrElse(fallbackResultSupplier: () -> T) = result
 
-    override fun consume(resultConsumer: (T) -> Unit, failureConsumer: (Throwable) -> Unit) = resultConsumer.invoke(result)
+    override fun consume(resultConsumer: (T) -> Unit, failureConsumer: (FAILURE) -> Unit) = resultConsumer.invoke(result)
 }
 
-class FailedComputation<T>(private val failure: Throwable) : Computation<T>() {
-    override fun getResult() : T? = null
+class FailedComputation<T, FAILURE : Throwable>(private val failure: FAILURE) : Computation<T, FAILURE>() {
+    override fun getResult(): T? = null
 
     override fun getFailure() = failure
 
     override fun getResultOrElse(fallbackResultSupplier: () -> T) = fallbackResultSupplier.invoke()
 
-    override fun consume(resultConsumer: (T) -> Unit, failureConsumer: (Throwable) -> Unit) = failureConsumer.invoke(failure)
+    override fun consume(resultConsumer: (T) -> Unit, failureConsumer: (FAILURE) -> Unit) = failureConsumer.invoke(failure)
 }
